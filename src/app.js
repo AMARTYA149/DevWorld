@@ -1,6 +1,12 @@
 const express = require("express");
-
+const { adminAuth } = require("../middlewares/auth.js");
 const app = express();
+
+// app.use("/admin", adminAuth); //Another way of handling auth middleware
+
+app.get("/admin/getAllUserData", adminAuth, (req, res) => {
+  res.send("Get all users data!!!");
+});
 
 app.get(
   "/user",
