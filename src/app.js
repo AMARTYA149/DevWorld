@@ -33,6 +33,30 @@ app.get(
   }
 );
 
+app.get("/getUserData", (req, res) => {
+  try {
+    throw new Error("Error thrown");
+    res.send("All user datas!");
+  } catch (error) {
+    res.status(500).send("Something went wrong, contact support!");
+  }
+});
+
+// Route Handlers with =>
+// 2 parameters -
+// app.use("/endpointName", (request, response)=>{});
+// 3 parameters -
+// app.use("/endpointName", (request, response, next)=>{});
+// 4 parameters -
+// app.use("/endpointName", (error, request, response, next)=>{});
+
+app.use("/", (error, request, response, next) => {
+  // Log your error
+  if (error) {
+    response.status(500).send("Something went wrong!");
+  }
+});
+
 app.listen(7777, () => {
   console.log("Server running");
 });
