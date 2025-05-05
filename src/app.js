@@ -2,7 +2,8 @@ const express = require("express");
 const connectDB = require("./config/database.js");
 const app = express();
 const User = require("./models/user.js");
-
+const { validateSignupData } = require("./utils/validation.js");
+const bcrypt = require("bcrypt");
 // Route Handlers with =>
 // 2 parameters -
 // app.use("/endpointName", (request, response)=>{});
@@ -14,10 +15,21 @@ const User = require("./models/user.js");
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  //Creating a new instance of the User model
-  const user = new User(req.body);
-
   try {
+    // validation of data
+    validateSignupData(req);
+    const { firstName, lastName, emailId, password } = req.body;
+
+    // encrypt the password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Creating a new instance of the User model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
     if (user.skills) {
       user.skills = [...new Set(user.skills.map((item) => item.trim()))];
       if (user.skills.length > 5) {
@@ -27,7 +39,29 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
-    res.status(500).send(`Error saving user: ${error}`);
+    res.status(500).send(`${error}`);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { emailId, password } = req.body;
+
+  const user = await User.findOne({ emailId });
+
+  try {
+    if (!user) {
+      throw new Error("Invalid Credentials!");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      res.send("Login Successful!");
+    } else {
+      throw new Error("Invalid Credentials!");
+    }
+  } catch (error) {
+    res.status(500).send(`${error}`);
   }
 });
 
@@ -43,7 +77,7 @@ app.get("/user", async (req, res) => {
       res.send(users);
     }
   } catch (error) {
-    res.status(500).send("Something went wrong!");
+    res.status(500).send("ERROR: " + error.message);
   }
 });
 
@@ -58,7 +92,7 @@ app.get("/feed", async (req, res) => {
       res.send(users);
     }
   } catch (error) {
-    res.status(500).send("Something went wrong!");
+    res.status(500).send("ERROR: " + error.message);
   }
 });
 
@@ -70,7 +104,7 @@ app.delete("/user", async (req, res) => {
     const user = await User.findByIdAndDelete(userId);
     res.send("User deleted successfully");
   } catch (error) {
-    res.status(500).send("Something went wrong!");
+    res.status(500).send("ERROR: " + error.message);
   }
 });
 
@@ -115,7 +149,7 @@ app.patch("/user/:userId", async (req, res) => {
 //     const user = await User.find({ emailId: userEmail }).updateOne(userData);
 //     res.send("User updated successfully by email!");
 //   } catch (error) {
-//     res.status(500).send("Something went wrong!");
+//     res.status(500).send("ERROR: " + error.message);
 //   }
 // });
 

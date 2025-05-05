@@ -16,6 +16,7 @@
   "author": "Amartya Aishwarya",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.21.2",
     "mongoose": "^8.14.1",
     "nodemon": "^3.1.10",
