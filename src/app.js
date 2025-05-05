@@ -21,7 +21,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
-    res.status(400).send("Error saving user: ", error.message);
+    res.status(500).send(`Error saving user: ${error}`);
   }
 });
 
@@ -75,25 +75,26 @@ app.patch("/user", async (req, res) => {
     const data = req.body;
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "before",
+      runValidators: true,
     });
     console.log("Older User: ", user);
     res.send("User updated successfully");
   } catch (error) {
-    res.status(500).send("Something went wrong!");
+    res.status(500).send(`UPDATE FAILED! ${error.message}`);
   }
 });
 
 // Update a user through email and patch http call
-app.patch("/updateUserByEmail", async (req, res) => {
-  try {
-    const userEmail = req.body.emailId;
-    const userData = req.body;
-    const user = await User.find({ emailId: userEmail }).updateOne(userData);
-    res.send("User updated successfully by email!");
-  } catch (error) {
-    res.status(500).send("Something went wrong!");
-  }
-});
+// app.patch("/updateUserByEmail", async (req, res) => {
+//   try {
+//     const userEmail = req.body.emailId;
+//     const userData = req.body;
+//     const user = await User.find({ emailId: userEmail }).updateOne(userData);
+//     res.send("User updated successfully by email!");
+//   } catch (error) {
+//     res.status(500).send("Something went wrong!");
+//   }
+// });
 
 connectDB()
   .then(() => {
