@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = mongoose.Schema(
   {
@@ -21,13 +22,21 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       trim: true,
-      minLength: 8,
-      maxLength: 100,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong Password!");
+        }
+      },
     },
     age: {
       type: Number,
@@ -47,6 +56,11 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "https://static.thenounproject.com/png/4154905-200.png",
       trim: true,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
     },
     about: {
       type: String,

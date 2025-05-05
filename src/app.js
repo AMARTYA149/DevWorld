@@ -18,6 +18,12 @@ app.post("/signup", async (req, res) => {
   const user = new User(req.body);
 
   try {
+    if (user.skills) {
+      user.skills = [...new Set(user.skills.map((item) => item.trim()))];
+      if (user.skills.length > 5) {
+        throw new Error("Skills can not be more than 5");
+      }
+    }
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
@@ -69,15 +75,32 @@ app.delete("/user", async (req, res) => {
 });
 
 // Update a user through id using patch http call
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const data = req.body;
+  const ALLOWED_UPDATES = ["photoUrl", "about", "age", "gender", "skills"];
+
   try {
-    const userId = req.body.userId;
-    const data = req.body;
+    const isAllowedUpdate = Object.keys(data).every((item) =>
+      ALLOWED_UPDATES.includes(item)
+    );
+
+    if (!isAllowedUpdate) {
+      throw new Error("Update not allowed!");
+    }
+
+    if (data.skills) {
+      data.skills = [...new Set(data.skills.map((item) => item.trim()))];
+      if (data.skills.length > 5) {
+        throw new Error("Skills can not be more than 5");
+      }
+    }
+
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "before",
       runValidators: true,
     });
-    console.log("Older User: ", user);
+
     res.send("User updated successfully");
   } catch (error) {
     res.status(500).send(`UPDATE FAILED! ${error.message}`);
