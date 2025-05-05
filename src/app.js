@@ -25,6 +25,76 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// Get user by email
+app.get("/user", async (req, res) => {
+  const userEmailID = req.body.emailId;
+  try {
+    const users = await User.find({ emailId: userEmailID });
+
+    if (users.length === 0) {
+      res.status(404).send("User not found!");
+    } else {
+      res.send(users);
+    }
+  } catch (error) {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+// Feed API - get all users
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    if (users.length === 0) {
+      res.status(404).send("No users found!");
+    } else {
+      res.send(users);
+    }
+  } catch (error) {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+// Delete a user
+app.delete("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+
+    const user = await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (error) {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+// Update a user through id using patch http call
+app.patch("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const data = req.body;
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "before",
+    });
+    console.log("Older User: ", user);
+    res.send("User updated successfully");
+  } catch (error) {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+// Update a user through email and patch http call
+app.patch("/updateUserByEmail", async (req, res) => {
+  try {
+    const userEmail = req.body.emailId;
+    const userData = req.body;
+    const user = await User.find({ emailId: userEmail }).updateOne(userData);
+    res.send("User updated successfully by email!");
+  } catch (error) {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully!");
