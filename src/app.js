@@ -4,6 +4,8 @@ const app = express();
 const User = require("./models/user.js");
 const { validateSignupData } = require("./utils/validation.js");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+
 // Route Handlers with =>
 // 2 parameters -
 // app.use("/endpointName", (request, response)=>{});
@@ -13,6 +15,7 @@ const bcrypt = require("bcrypt");
 // app.use("/endpointName", (error, request, response, next)=>{});
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -56,6 +59,9 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (isPasswordValid) {
+      // Create a JWT token
+      // Add token to the cookie and send the response back to the client
+      res.cookie("token", "adsafwefocjwofjweoofwcfwfoiwfhgcnwuiofhehigherg");
       res.send("Login Successful!");
     } else {
       throw new Error("Invalid Credentials!");
@@ -63,6 +69,13 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).send(`${error}`);
   }
+});
+
+app.get("/profile", async (req, res) => {
+  const cookie = req.cookies;
+  console.log(cookie);
+
+  res.send("Reading cookie");
 });
 
 // Get user by email
