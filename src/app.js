@@ -1,46 +1,6 @@
 const express = require("express");
-const { adminAuth } = require("../middlewares/auth.js");
+const connectDB = require("./config/database.js");
 const app = express();
-
-// app.use("/admin", adminAuth); //Another way of handling auth middleware
-
-app.get("/admin/getAllUserData", adminAuth, (req, res) => {
-  res.send("Get all users data!!!");
-});
-
-app.get(
-  "/user",
-  (req, res, next) => {
-    console.log("Handling route handler 1");
-    // res.send("1st Response");
-    next();
-  },
-  [
-    (req, res, next) => {
-      console.log("Handling route handler 2");
-      //   res.send("2nd Response");
-      next();
-    },
-    (req, res, next) => {
-      console.log("Handling route handler 3");
-      //   res.send("3th Response");
-      next();
-    },
-  ],
-  (req, res, next) => {
-    console.log("Handling route handler 4");
-    res.send("4th Response");
-  }
-);
-
-app.get("/getUserData", (req, res) => {
-  try {
-    throw new Error("Error thrown");
-    res.send("All user datas!");
-  } catch (error) {
-    res.status(500).send("Something went wrong, contact support!");
-  }
-});
 
 // Route Handlers with =>
 // 2 parameters -
@@ -50,13 +10,13 @@ app.get("/getUserData", (req, res) => {
 // 4 parameters -
 // app.use("/endpointName", (error, request, response, next)=>{});
 
-app.use("/", (error, request, response, next) => {
-  // Log your error
-  if (error) {
-    response.status(500).send("Something went wrong!");
-  }
-});
-
-app.listen(7777, () => {
-  console.log("Server running");
-});
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully!");
+    app.listen(7777, () => {
+      console.log("Server running on port 7777!");
+    });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected!");
+  });
