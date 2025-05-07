@@ -5,6 +5,8 @@ const User = require("./models/user.js");
 const { validateSignupData } = require("./utils/validation.js");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const JWT_SECRET_WORD = "Dev@World_149";
 
 // Route Handlers with =>
 // 2 parameters -
@@ -60,8 +62,10 @@ app.post("/login", async (req, res) => {
 
     if (isPasswordValid) {
       // Create a JWT token
+
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET_WORD);
       // Add token to the cookie and send the response back to the client
-      res.cookie("token", "adsafwefocjwofjweoofwcfwfoiwfhgcnwuiofhehigherg");
+      res.cookie("token", token);
       res.send("Login Successful!");
     } else {
       throw new Error("Invalid Credentials!");
@@ -72,10 +76,26 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/profile", async (req, res) => {
-  const cookie = req.cookies;
-  console.log(cookie);
+  try {
+    const cookie = req.cookies;
 
-  res.send("Reading cookie");
+    const { token } = cookie;
+    if (!token) {
+      throw new Error("Invalid token!");
+    }
+    const decodedMessage = jwt.verify(token, JWT_SECRET_WORD);
+    console.log("decodedMessage: ", decodedMessage);
+    const { _id } = decodedMessage;
+    console.log("Logged in user is: " + _id);
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("No user exists!");
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send("ERROR: " + error.message);
+  }
 });
 
 // Get user by email
