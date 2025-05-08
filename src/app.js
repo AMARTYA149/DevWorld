@@ -64,9 +64,15 @@ app.post("/login", async (req, res) => {
     if (isPasswordValid) {
       // Create a JWT token
 
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET_WORD); // generate JWT token of the loggedin user through the _id of the user loggedin
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET_WORD, {
+        expiresIn: "1d",
+      }); // generate JWT token of the loggedin user through the _id of the user loggedin
+
       // Add token to the cookie and send the response back to the client
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 900000),
+        httpOnly: true,
+      });
       res.send("Login Successful!");
     } else {
       throw new Error("Invalid Credentials!");
@@ -85,93 +91,11 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-// Get user by email
-app.get("/user", async (req, res) => {
-  const userEmailID = req.body.emailId;
-  try {
-    const users = await User.find({ emailId: userEmailID });
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
 
-    if (users.length === 0) {
-      res.status(404).send("User not found!");
-    } else {
-      res.send(users);
-    }
-  } catch (error) {
-    res.status(500).send("ERROR: " + error.message);
-  }
+  res.send(user.firstName + " send the connection request!");
 });
-
-// Feed API - get all users
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-
-    if (users.length === 0) {
-      res.status(404).send("No users found!");
-    } else {
-      res.send(users);
-    }
-  } catch (error) {
-    res.status(500).send("ERROR: " + error.message);
-  }
-});
-
-// Delete a user
-app.delete("/user", async (req, res) => {
-  try {
-    const userId = req.body.userId;
-
-    const user = await User.findByIdAndDelete(userId);
-    res.send("User deleted successfully");
-  } catch (error) {
-    res.status(500).send("ERROR: " + error.message);
-  }
-});
-
-// Update a user through id using patch http call
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const data = req.body;
-  const ALLOWED_UPDATES = ["photoUrl", "about", "age", "gender", "skills"];
-
-  try {
-    const isAllowedUpdate = Object.keys(data).every((item) =>
-      ALLOWED_UPDATES.includes(item)
-    );
-
-    if (!isAllowedUpdate) {
-      throw new Error("Update not allowed!");
-    }
-
-    if (data.skills) {
-      data.skills = [...new Set(data.skills.map((item) => item.trim()))];
-      if (data.skills.length > 5) {
-        throw new Error("Skills can not be more than 5");
-      }
-    }
-
-    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "before",
-      runValidators: true,
-    });
-
-    res.send("User updated successfully");
-  } catch (error) {
-    res.status(500).send(`UPDATE FAILED! ${error.message}`);
-  }
-});
-
-// Update a user through email and patch http call
-// app.patch("/updateUserByEmail", async (req, res) => {
-//   try {
-//     const userEmail = req.body.emailId;
-//     const userData = req.body;
-//     const user = await User.find({ emailId: userEmail }).updateOne(userData);
-//     res.send("User updated successfully by email!");
-//   } catch (error) {
-//     res.status(500).send("ERROR: " + error.message);
-//   }
-// });
 
 connectDB()
   .then(() => {
