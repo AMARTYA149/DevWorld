@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET_WORD = "Dev@World_149";
+const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema(
   {
@@ -78,6 +79,7 @@ const userSchema = mongoose.Schema(
 );
 
 userSchema.methods.getJWT = async function () {
+  // DONT USE AAROW FUNCTION HERE as THIS KEYWORD WILL NOT WORK PROPERLY HERE
   const user = this;
 
   const token = await jwt.sign({ _id: user._id }, JWT_SECRET_WORD, {
@@ -85,6 +87,17 @@ userSchema.methods.getJWT = async function () {
   });
 
   return token;
+};
+
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+  const passwordHash = user.password;
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash
+  );
+
+  return isPasswordValid;
 };
 
 module.exports = mongoose.model("User", userSchema);
