@@ -1,4 +1,5 @@
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 const validateSignupData = (req) => {
   const { firstName, lastName, emailId, password } = req.body;
@@ -31,7 +32,17 @@ const validateEditProfileData = (req) => {
   return isEditAllowed;
 };
 
+const validateCurrentPassword = async (req) => {
+  const user = req.user;
+  const currentPasswordEntered = req.body.currentPassword;
+  const isPasswordValid = await bcrypt.compare(
+    currentPasswordEntered, user.password
+  );
+
+  return isPasswordValid;
+}
+
 module.exports = {
   validateSignupData,
-  validateEditProfileData,
+  validateEditProfileData, validateCurrentPassword
 };

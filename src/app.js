@@ -2,6 +2,9 @@ const express = require("express");
 const connectDB = require("./config/database.js");
 const app = express();
 const cookieParser = require("cookie-parser");
+const authRouter = require("./routes/authRouter.js");
+const profileRouter = require("./routes/profileRouter.js");
+const requestRouter = require("./routes/requestRouter.js");
 
 // Route Handlers with =>
 // 2 parameters -
@@ -13,10 +16,6 @@ const cookieParser = require("cookie-parser");
 
 app.use(express.json());
 app.use(cookieParser());
-
-const authRouter = require("./routes/authRouter.js");
-const profileRouter = require("./routes/profileRouter.js");
-const requestRouter = require("./routes/requestRouter.js");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
