@@ -19,7 +19,19 @@ const connectionRequestSchema = new mongoose.Schema(
             }
         }
     },
-    { timestamps: true });
+    { timestamps: true }
+);
+
+// SCHEMA VALIDATION - pre level validation (Pre-hook middleware)
+connectionRequestSchema.pre("save", function (next) {
+    const connectionRequest = this;
+
+    if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+        throw new Error("Cannot send request to yourself!");
+    }
+
+    next();
+})
 
 const ConnectionRequestModel = new mongoose.model("ConnectionRequest", connectionRequestSchema);
 
