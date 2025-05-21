@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRouter.js");
 const profileRouter = require("./routes/profileRouter.js");
 const requestRouter = require("./routes/requestRouter.js");
+const userRouter = require("./routes/userRouter.js");
 
 // Route Handlers with =>
 // 2 parameters -
@@ -20,6 +21,7 @@ app.use(cookieParser());
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter)
 
 connectDB()
   .then(() => {
