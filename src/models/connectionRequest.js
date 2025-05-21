@@ -22,6 +22,11 @@ const connectionRequestSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Compound Index to find the connectionRequest between fromUserId & toUserId fastly
+connectionRequestSchema.index({
+    fromUserId: 1, toUserId: 1
+});
+
 // SCHEMA VALIDATION - pre level validation (Pre-hook middleware)
 connectionRequestSchema.pre("save", function (next) {
     const connectionRequest = this;

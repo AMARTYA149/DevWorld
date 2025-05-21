@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema(
       trim: true,
       minLength: 3,
       maxLength: 50,
+      index: true
     },
     lastName: {
       type: String,
@@ -81,6 +82,8 @@ const userSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = async function () {
   // DONT USE AAROW FUNCTION HERE as THIS KEYWORD WILL NOT WORK PROPERLY HERE
