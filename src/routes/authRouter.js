@@ -34,11 +34,13 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
-  const { emailId, password } = req.body;
 
-  const user = await User.findOne({ emailId });
 
   try {
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({ emailId });
+
     if (!user) {
       throw new Error("Invalid Credentials!");
     }
@@ -55,7 +57,12 @@ authRouter.post("/login", async (req, res) => {
         expires: new Date(Date.now() + 8 * 3600000),
         httpOnly: true,
       });
-      res.send("Login Successful!");
+      res.json({
+        data: user,
+        message: "Login successful!",
+
+
+      });
     } else {
       throw new Error("Invalid Credentials!");
     }
