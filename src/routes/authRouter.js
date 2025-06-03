@@ -26,8 +26,15 @@ authRouter.post("/signup", async (req, res) => {
         throw new Error("Skills can not be more than 5");
       }
     }
-    await user.save();
-    res.send("User added successfully!");
+    const signUpUser = await user.save();
+    const token = await user.getJWT(); // generate JWT token of the loggedin user through the _id of the user loggedin
+
+    // Add token to the cookie and send the response back to the client
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+      httpOnly: true,
+    });
+    res.json({ message: "User added successfully!", data: signUpUser });
   } catch (error) {
     res.status(500).send(`${error}`);
   }
