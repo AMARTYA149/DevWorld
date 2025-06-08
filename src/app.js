@@ -7,6 +7,7 @@ const profileRouter = require("./routes/profileRouter.js");
 const requestRouter = require("./routes/requestRouter.js");
 const userRouter = require("./routes/userRouter.js");
 const cors = require("cors");
+const PORT = 7777;
 
 // Route Handlers with =>
 // 2 parameters -
@@ -32,7 +33,7 @@ app.use("/", userRouter)
 connectDB()
   .then(() => {
     console.log("Database connected successfully!");
-    app.listen(7777, () => {
+    app.listen(PORT, () => {
       console.log("Server running on port 7777!");
     });
   })
