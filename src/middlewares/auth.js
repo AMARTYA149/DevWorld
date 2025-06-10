@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const JWT_SECRET_WORD = "Dev@World_149";
+const JWT_SECRET_WORD = process.env.JWT_SECRET;
 
 const userAuth = async (req, res, next) => {
   // Read the token from the req

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET_WORD = "Dev@World_149";
+const JWT_SECRET_WORD = process.env.JWT_SECRET;
 const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema(

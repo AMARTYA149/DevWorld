@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const connectDB = require("./config/database.js");
 const app = express();
@@ -7,7 +8,8 @@ const profileRouter = require("./routes/profileRouter.js");
 const requestRouter = require("./routes/requestRouter.js");
 const userRouter = require("./routes/userRouter.js");
 const cors = require("cors");
-const PORT = 7777;
+
+const PORT = process.env.PORT;
 
 // Route Handlers with =>
 // 2 parameters -
@@ -32,9 +34,10 @@ app.use("/", userRouter)
 
 connectDB()
   .then(() => {
-    console.log("Database connected successfully!");
+
     app.listen(PORT, () => {
-      console.log("Server running on port 7777!");
+      console.log("Server running on port! " + process.env.PORT);
+      console.log("Database connected successfully!");
     });
   })
   .catch((err) => {
