@@ -8,8 +8,8 @@ const profileRouter = require("./routes/profileRouter.js");
 const requestRouter = require("./routes/requestRouter.js");
 const userRouter = require("./routes/userRouter.js");
 const cors = require("cors");
-
 const PORT = process.env.PORT;
+require("./utils/cronjob.js");
 
 // Route Handlers with =>
 // 2 parameters -
